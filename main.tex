@@ -1,0 +1,212 @@
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[10pt]{article}
+\usepackage{url}
+\usepackage{mwe}
+\usepackage{graphicx}
+\usepackage{pgfplots}
+\usepackage{fmtcount}
+\input{structure.tex} % Include the file specifying the document structure and styling
+
+%----------------------------------------------------------------------------------------
+%	INVOICE INFORMATION
+%----------------------------------------------------------------------------------------
+
+%------------------------------------------------
+% Invoice information
+
+\billdate{\today} % Invoice number
+\billcycle{30 Days} % Date issued
+\fromdate{\today} % Due date, a number of days into the future, use 0 for due on receipt
+\todate{\DayAfter[7]}
+
+%------------------------------------------------
+% Recipient/payee information
+
+
+\payeename{Dr. Pradeep Yemula \\ Employee ID -F126 \\  Location: IIT Hyderabad \\ Address: Faculty Tower 2 ,FT2 12 B2}
+\payeeaddresslineone{Bill Date : 13/4/2020}
+\payeeaddresslinetwo{ Bill Cycle:}
+%\payeecontactlineone{From Date: 13-03-2020}
+%\payeecontactlinetwo{ To Date: 12-04-2020}
+
+%----------------------------------------------------------------------------------------
+%                             CREATING BORDER FOR DOCUMENT
+%----------------------------------------------------------------------------------------
+
+\usepackage{pgf}
+\usepackage{pgfpages}
+
+\pgfpagesdeclarelayout{boxed}
+{
+  \edef\pgfpageoptionborder{0pt}
+}
+{
+  \pgfpagesphysicalpageoptions
+  {%
+    logical pages=1,%
+  }
+  \pgfpageslogicalpageoptions{1}
+  {
+    border code=\pgfsetlinewidth{1.5pt}\pgfstroke,%
+    border shrink=0.98\pgfpageoptionborder,%
+    resized width=0.98\pgfphysicalwidth,%
+    resized height=\pgfphysicalheight,%
+    center=\pgfpoint{.5\pgfphysicalwidth}{.5\pgfphysicalheight}%
+  }%
+}
+\pgfpagesuselayout{boxed}
+
+% --------------------------------------------------------------------------------------- 
+% \pgfplotsset{compat=1.15}
+
+\begin{document}
+
+\thispagestyle{empty} % Suppress headers and footers
+%----------------------------------------------------------------------------------------
+%	                  IITH LOGO
+%----------------------------------------------------------------------------------------
+\begin{center}
+  \begin{figure}
+        \center{\includegraphics[scale = 0.25]{horzlogolong.png}}
+  \end{figure}
+\end{center}
+%----------------------------------------------------------------------------------------
+%                   TITLE WITH MONTH (CAN BE UPDATED
+%----------------------------------------------------------------------------------------
+\centering
+{{\color{highlightcolour}  \textbf{\Large Electricity Bill} \\ \vspace{0.25cm} \large --month-- , --year--}} 
+
+\vspace{0.25cm}
+\bigskip
+
+%----------------------------------------------------------------------------------------
+%                   INVOICE DETAILS
+%----------------------------------------------------------------------------------------
+%\invoicedtotable
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|>{\raggedright} p{3.1cm} >{\raggedright} p{5cm} | >{\raggedright} p{3cm} >{\raggedright\arraybackslash} p{3cm}|}
+    \hline
+         Employee Name & : Dr. Pradeep Kumar Yemula & Bill Date & : --billdate--  \\
+         Employee ID &: F126 & Bill Cycle &: --billcycle-- days\\
+         Location &: IIT Hyderabad & From Date &: --fromdate--\\
+         Address &: Faculty Tower -2, & To Date &: --todate--\\
+         & \hspace{0.1cm} Flat - 12B2 &&\\
+         \hline
+    \end{tabular}
+\end{table}
+\vspace{0.25cm}
+\bigskip
+%----------------------------------------------------------------------------------------
+%                   BILLING DETAILS
+%----------------------------------------------------------------------------------------
+
+%\begin{billingdetails}
+%\end{billingdetails}
+%\vspace{0.5cm}
+%----------------------------------------------------------------------------------------
+%                   TYPES OF POWER ETC
+%----------------------------------------------------------------------------------------
+
+\FPmul\rsg{-eg-}{7.50}\FPround\rsg{\rsg}{2}
+\FPmul\rsd{-ed-}{10.60}\FPround\rsd{\rsd}{2}
+\FPadd\rsgrsd{\rsg}{\rsd}\FPround\rsgrsd{\rsgrsd}{2}
+\FPround\totalrs{\rsgrsd}{0}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{>{\raggedright} p{6.25cm} >{\raggedright} p{2cm} >{\raggedright} p{2cm} >{\raggedright} p{2cm} >{\raggedright\arraybackslash} p{1.5cm}}
+    \arrayrulecolor{rulecolour}\toprule[0.5pt]
+       \textbf {Source of Power}  & \textbf{Grid} & \textbf{Diesel} & \textbf{Total} & \textbf{Units}  \\
+       \arrayrulecolor{rulecolour}\toprule[0.5pt]
+        Current Reading on --todate-- & -ceg- & -ced- & -- & kWh\\
+        Previous Reading on --fromdate-- & -peg- & -ped- & -- &kWh\\
+        Consumption & -eg- & -ed- & -tec- & kWh\\
+        Unit Price & 7.50 & 10.60 & & Rs/kWh\\
+        \arrayrulecolor{rulecolour}\toprule[0.5pt]
+        Amount & \rsg & \rsd & \rsgrsd & Rs\\
+        \arrayrulecolor{rulecolour}\toprule[0.5pt]
+        \textbf{Bill Payable} & & & \totalrs & Rs\\ 
+        \arrayrulecolor{rulecolour}\toprule[0.5pt]
+    \end{tabular}
+\end{table}
+
+\begin{flushleft}
+\large \textbf{In Words:} \numberstringnum{\totalrs} \large Rupees Only.
+\end{flushleft} 
+%\begin{invoicetable}
+%	\invoiceitem{Current Reading on dd--mm--yyyy}{534.2}{122.5}{kWh}
+%	\invoiceitem{Previous Reading on dd mm yyyy }{400.2}{120.5}{kWh}
+%	\invoiceitem{Consumption}{134}{2}{kWh}
+%  \unitprice{Unit price}{7}{10}
+%\end{invoicetable}
+
+%\vspace{0.5cm}
+%----------------------------------------------------------------------------------------
+%                   IN WORDS
+%----------------------------------------------------------------------------------------
+
+\vspace{0.25cm}
+\bigskip
+%----------------------------------------------------------------------------------------
+%                   BR GRAPH
+%----------------------------------------------------------------------------------------
+\pgfplotsset{every tick label/.append style={font=\footnotesize}}
+
+\begin{tikzpicture}
+\begin{axis}[
+title    = \textbf{Daily Energy Consumption Pattern (kWh)},
+    ybar,
+     bar width=4pt,
+    height=5cm,
+    width=13cm,
+    width=\textwidth,
+    height=.4\textwidth,
+    % symbolic x coords={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31},
+    symbolic x coords={--dates--},
+    % xtick=data,
+    axis lines = left, xtick = data ,
+    ytick = \empty, 
+    enlarge x limits  = 0.01,
+    nodes near coords,
+    %ylabel={Units consumed},
+     axis line style={draw=none},
+     tick style={draw=none}
+    ]
+    % \addplot coordinates {(1,1.1) (2,2.1) (3,3)(4,4) (5,5)(6,6) (7,7)(8,8) (9,9) (10,10) (11,11) (12,12) (13,13)(14,14) (15,15)(16,16) (17,17)(18,18) (19,19)(20,20) (21,21) (22,22) (23,23)(24,24) (25,25)(26,26) (27,27)(28,28) (29,29)(30,30)(31,31)};
+    \addplot coordinates {--datewithvalues--};
+  \end{axis}
+\end{tikzpicture}
+
+%----------------------------------------------------------------------------------------
+%                   PREVIOUS MONTHS COMPARISION &  MORE INFORMATION
+%----------------------------------------------------------------------------------------
+\newcommand{\information}{
+  {
+  \centering
+  \footnotesize
+  \begin{tabular}{p{0.16\textwidth} p{0.16\textwidth} | p{0.33\textwidth} | p{0.33\textwidth}}
+    \arrayrulecolor{rulecolour}\toprule[0.5pt] % Horizontal line at the top of the table
+    \normalsize \textbf{Last 3 Months} && \normalsize \textbf{Last year this month} & \normalsize \textbf{Tip of the month} \\
+    % \vspace{0.5cm}\\
+    \normalsize --minus1-- & : \_ kWh & & \normalsize Switch of \\
+    \normalsize --minus2-- & : \_ kWh & \normalsize -- kWh & \normalsize Lights, Fans \\
+    \normalsize --minus3-- & : \_ kWh& & \normalsize while leaving room\\
+    \arrayrulecolor{rulecolour}\bottomrule[0.5pt] % Horizontal line at the bottom of the table
+  \end{tabular}
+  }
+}
+
+\vfill
+\information 
+\vfill
+%----------------------------------------------------------------------------------------
+%                   DISCCLAIMER & FEEDBACK
+%----------------------------------------------------------------------------------------
+This is auto generatied bill, for feedback email - 
+\url{iith_ems1@iith.ac.in}
+\end{document}

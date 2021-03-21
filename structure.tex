@@ -1,0 +1,176 @@
+%----------------------------------------------------------------------------------------
+%	REQUIRED PACKAGES AND MISC CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+% \usepackage{tfrupee} % Required for ruppe symbol but need to install sudo apt-get install texlive-fonts-extra (1,023MB) & use \rupee
+
+\usepackage{graphicx} % Required for including images
+
+\usepackage[
+	a4paper, % Change to letterpaper for US Letter
+	top=2.5cm, 
+	bottom=2.5cm, 
+	left=2.5cm, 
+	right=2.5cm
+]{geometry} % Document margins
+
+\usepackage{fp} % Required for invoice calculations
+
+\usepackage[group-separator={,},group-minimum-digits=4]{siunitx} % Required for automatically adding commas to large numbers and delimitting for 4 digits (e.g. 1,000)
+
+\usepackage{advdate} % Required for date calculation
+
+%----------------------------------------------------------------------------------------
+%	FONTS
+%----------------------------------------------------------------------------------------
+
+\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[T1]{fontenc} % Output font encoding for international characters
+
+\usepackage{tgadventor} % Use the TeX Gyre Adventor font
+\renewcommand*\familydefault{\sfdefault} % Set the base font of the document to sans serif
+
+%----------------------------------------------------------------------------------------
+%	COLOURS
+%----------------------------------------------------------------------------------------
+
+\usepackage{xcolor} % Required for defining and using custom colours
+
+\definecolor{highlightcolour}{HTML}{DF0174} % Colour used for making text stand out
+\definecolor{rulecolour}{HTML}{B2BEB5} % Colour used for rules
+
+%----------------------------------------------------------------------------------------
+%	TABLES
+%----------------------------------------------------------------------------------------
+
+\usepackage{colortbl} % Required for colouring table cells (used for rules)
+
+\usepackage{booktabs} % Required for nicer table rules
+
+\usepackage{multirow} % Required for allowing cells to take up multiple rows in tables
+
+\usepackage{array} % Required for customizing table spacing and features
+\def\arraystretch{1.2} % Table row spacing, 1 is the default
+
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}} % Define a fixed-width right-aligned column type
+
+%----------------------------------------------------------------------------------------
+%	CUSTOM COMMANDS
+%----------------------------------------------------------------------------------------
+
+\newcommand{\payeename}[1]{\renewcommand{\payeename}{#1}}
+\newcommand{\payeejob}[1]{\renewcommand{\payeejob}{#1}}
+\newcommand{\payeeaddresslineone}[1]{\renewcommand{\payeeaddresslineone}{#1}}
+\newcommand{\payeeaddresslinetwo}[1]{\renewcommand{\payeeaddresslinetwo}{#1}}
+\newcommand{\payeecontactlineone}[1]{\renewcommand{\payeecontactlineone}{#1}}
+\newcommand{\payeecontactlinetwo}[1]{\renewcommand{\payeecontactlinetwo}{#1}}
+
+\newcommand{\billdate}[1]{\renewcommand{\billdate}{#1}}
+\newcommand{\billcycle}[1]{\renewcommand{\billcycle}{#1}}
+\newcommand{\fromdate}[1]{\renewcommand{\fromdate}{#1}}
+\newcommand{\todate}[1]{\renewcommand{\todate}{#1}}
+
+%------------------------------------------------
+
+% Running variables
+\gdef\variableA{0}
+\gdef\variableB{0}
+\gdef\variableC{0}
+\gdef\variableD{0}
+
+% Cumulative variables
+\gdef\TotalA{0} % Total before tax
+\gdef\TotalB{0} % Tax
+\gdef\TotalC{0} % Net after tax
+
+\newcommand{\taxrate}[1]{\renewcommand{\taxrate}{#1}} % Tax rate used to automatically calculate tax
+
+%----------------------------------------------------------------------------------------
+%	INVOICE TABLES
+%----------------------------------------------------------------------------------------
+
+% Payee information (top table)
+\newcommand{\invoicedtotable}{
+	{
+	\centering
+	\footnotesize
+	\begin{tabular}{p{0.30\textwidth} | p{0.30\textwidth} | p{0.30\textwidth}}
+		\arrayrulecolor{rulecolour}\toprule[0.5pt] % Horizontal line at the top of the table
+		% \multirow{3}{*}{{\color{highlightcolour} \Huge INVOICE}} & \textbf{Recipient} & \\
+		\normalsize\payeename & \normalsize\payeeaddresslineone & \normalsize\payeecontactlineone \\ 
+		\vspace{0.5cm}\\
+		\normalsize\payeejob & \normalsize\payeeaddresslinetwo & \normalsize\payeecontactlinetwo \\
+		\arrayrulecolor{rulecolour}\bottomrule[0.5pt] % Horizontal line at the bottom of the table
+	\end{tabular}
+	}
+}
+
+
+%-------------------------------------------------------------------------------------
+%            Invoice items table
+%---------------------------------------------------------------------------------------
+\newenvironment{invoicetable}
+{
+	\begin{tabular}{p{0.43\textwidth} R{0.12\textwidth} R{0.12\textwidth} R{0.12\textwidth} R{0.12\textwidth}}
+			\arrayrulecolor{rulecolour}\toprule[0.5pt]
+		\textbf{Source of Power} & \textbf{Grid} & \textbf{Diesel} & \textbf{Total} & \textbf{Units} \\
+		\arrayrulecolor{rulecolour}\toprule[0.5pt]
+}
+{	
+		\arrayrulecolor{rulecolour}\bottomrule[0.5pt]
+		\\ [-1em] % Reduce whitespace before the totals
+		\textbf{Bill Payable (Rounded)} & \num{670} & \num{20} & \num{690} &{Rs}\\ 
+	\end{tabular}
+}
+
+
+%----------------------------------------------------------------------------------------
+%	INVOICE ITEM LINES
+%----------------------------------------------------------------------------------------
+
+\newcommand{\invoiceitem}[4]{
+
+	\FPadd\gross{#2}{#3}\FPround\gross{\gross}{2}
+	\global\let\variableA\gross % Set variable for use in table and other calculations
+	
+	%------------------------------------------------
+	
+	% Calculation of cumulative variables (total for invoice)
+	%\FPeval{\beforetax}{round(\TotalA + \variableA, 2)} % Add the current before tax value to the previous total
+	%\global\let\TotalA\beforetax % Set variable for display at the end and in other calculations
+	
+	% Output the table row
+	#1 & % Item name
+	\num{#2} & % Quantity
+	\num{#3} & % Rate
+	- &% Subtotal
+	%\num{\variableA} &% Subtotal
+	#4 \\
+}
+
+%-------------------------------------------------------
+%           UNITPRICE
+%--------------------------------------------------------
+
+\newcommand{\unitprice}[3]{
+	
+	% Output the table row
+	#1 & % Item name
+	\num{#2} & % Quantity
+	\num{#3} & % Rate
+	&% Subtotal
+	Rs / kWh \\
+}
+
+
+
+\newenvironment{billingdetails}
+{
+	\begin{tabular}{p{0.22\textwidth} R{0.22\textwidth} R{0.22\textwidth} R{0.22\textwidth}}
+		\textbf{BILL DATE} & \textbf{BILL CYCLE} & \textbf{FROM DATE} & \textbf{TO DATE} \\
+		\arrayrulecolor{rulecolour}\toprule[0.5pt]
+		\billdate & \billcycle & \fromdate & \todate \\
+	\end{tabular}
+}
+
+
